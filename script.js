@@ -130,14 +130,33 @@ async function handleBookSubmit(e) {
 // 7. Issue Book
 async function handleIssueSubmit(e) {
     e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerText;
+    
+    // பட்டனை லோடிங் ஸ்டேட்டுக்கு மாத்துறோம்
+    btn.innerText = "Processing & Sending Email...";
+    btn.disabled = true;
+
     const uId = document.getElementById('issueUId').value;
     const bId = document.getElementById('issueBId').value;
-    const res = await fetch(`${API_BASE}/issue?userId=${uId}&bookId=${bId}`, { method: 'POST' });
-    if(res.ok) {
-        notify('Issued!', 'Book handover successful 📖', 'success');
-        e.target.reset();
-    } else {
-        notify('Failed', await res.text(), 'warning');
+
+    try {
+        const res = await fetch(`${API_BASE}/issue?userId=${uId}&bookId=${bId}`, { method: 'POST' });
+        
+        if(res.ok) {
+            notify('Success!', 'Book Issued & Email Sent! 📖📩', 'success');
+            e.target.reset();
+            fetchBooks();
+        } else {
+            const msg = await res.text();
+            notify('Failed', msg, 'warning');
+        }
+    } catch (e) {
+        notify('Error', 'Server Error!', 'error');
+    } finally {
+        // பட்டனை பழைய நிலைக்கு கொண்டு வர்றோம்
+        btn.innerText = originalText;
+        btn.disabled = false;
     }
 }
 
