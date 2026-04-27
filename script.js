@@ -205,8 +205,16 @@ async function showBookHistory(id) {
 }
 
 async function returnBook(tId) {
-    const res = await fetch(`${API_BASE}/return/${tId}`, { method: 'POST' });
-    if(res.ok) { notify('Success!', 'Book Returned 🔄', 'success'); closeModal(); fetchBooks(); }
+    try {
+        const res = await fetch(`${API_BASE}/return/${tId}`, { method: 'POST' });
+        if(res.ok) {
+            notify('Success!', 'Book Returned & Confirmation Email Sent! 🔄📩', 'success');
+            closeModal();
+            fetchBooks();
+        }
+    } catch (e) {
+        notify('Error', 'Return failed!', 'error');
+    }
 }
 
 function openModal(content) {
